@@ -17,11 +17,10 @@ type LoginResponse struct {
 }
 
 type RegisterResponse struct {
-	AccessToken string `json:"access_token"`
-	UserID      string `json:"user_id"`
-	Username    string `json:"username"`
-	Email       string `json:"email"`
-	RoleID      string `json:"role_id"`
-	CreatedAt   string `json:"created_at"`
-	UpdatedAt   string `json:"updated_at"`
+	UserID    string `json:"user_id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	RoleID    string `json:"role_id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }

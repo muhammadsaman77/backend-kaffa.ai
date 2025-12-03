@@ -6,6 +6,7 @@ import (
 
 	"backend-kaffa.ai/configs"
 	"backend-kaffa.ai/internal/controllers"
+	"backend-kaffa.ai/internal/middlewares"
 	"backend-kaffa.ai/internal/services"
 	"backend-kaffa.ai/internal/sqlc/users"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 )
 
 func main() {
+	configs.InitLogger()
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
@@ -34,7 +36,7 @@ func main() {
 	authController := controllers.NewAuthController(authService)
 
 	authRouter := r.Group("/api/v1/auth")
-	authRouter.POST("/login", authController.LoginUser())       // Placeholder for auth handler
-	authRouter.POST("/register", authController.RegisterUser()) // Placeholder for auth handler
+	authRouter.POST("/login", middlewares.LoggerMiddleware, authController.LoginUser)
+	authRouter.POST("/register", middlewares.LoggerMiddleware, authController.RegisterUser) // Placeholder for auth handler
 	r.Run(":2003")
 }
