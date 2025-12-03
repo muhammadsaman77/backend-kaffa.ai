@@ -1,0 +1,3 @@
+DELETE FROM stores;
+DELETE FROM users;
+DELETE FROM roles;
