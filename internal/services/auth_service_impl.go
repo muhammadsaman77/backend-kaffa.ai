@@ -10,6 +10,8 @@ import (
 	"backend-kaffa.ai/internal/dto"
 	"backend-kaffa.ai/internal/sqlc/users"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/oklog/ulid/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -53,5 +55,30 @@ func (s *AuthServiceImpl) LoginUser(ctx context.Context, loginRequest *dto.Login
 	return loginResponse, nil
 }
 func (s *AuthServiceImpl) RegisterUser(ctx context.Context, registerRequest *dto.RegisterRequest) (*dto.RegisterResponse, error) {
-	return nil, nil // Implement registration logic here
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerRequest.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, errors.New("PASSWORD_HASHING_FAILED")
+	}
+	user, err := s.UsersQueries.CreateUser(ctx, users.CreateUserParams{
+		ID:       ulid.Make().String(),
+		Username: registerRequest.Username,
+		Email:    registerRequest.Email,
+		Password: string(hashedPassword),
+		RoleID:   "admin",
+	})
+	if pgErr, ok := err.(*pgconn.PgError); ok {
+		if pgErr.Code == "23505" {
+			return nil, errors.New("USER_ALREADY_EXISTS")
+		}
+	}
+
+	return &dto.RegisterResponse{
+		UserID:    user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		RoleID:    user.RoleID,
+		CreatedAt: user.CreatedAt.Time.String(),
+		UpdatedAt: user.UpdatedAt.Time.String(),
+	}, nil
 }

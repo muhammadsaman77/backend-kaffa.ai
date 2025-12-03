@@ -52,6 +52,42 @@ func (controller *AuthControllerImpl) LoginUser() gin.HandlerFunc {
 	}
 }
 
-func (a *AuthControllerImpl) RegisterUser() gin.HandlerFunc {
-	return func(c *gin.Context) {}
+func (controller *AuthControllerImpl) RegisterUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var registerRequest dto.RegisterRequest
+		if err := c.ShouldBindJSON(&registerRequest); err != nil {
+			c.JSON(400, gin.H{
+				"mesage": "Invalid request payload",
+				"error":  pkg.ParseValidationErrors(err),
+			})
+			return
+		}
+		newUser, err := controller.AuthService.RegisterUser(c.Request.Context(), &registerRequest)
+		if err != nil {
+			if err.Error() == "PASSWORD_HASHING_FAILED" {
+				c.JSON(500, gin.H{
+					"message": "Internal Server Error",
+					"error":   "Failed to hash password",
+				})
+				return
+			}
+			if err.Error() == "USER_ALREADY_EXISTS" {
+				c.JSON(409, gin.H{
+					"message": "Conflict",
+					"error":   "User with given email or username already exists",
+				})
+				return
+			}
+			c.JSON(500, gin.H{
+				"message": "Internal Server Error",
+				"error":   err,
+			})
+			return
+		}
+		c.JSON(201, gin.H{
+			"message": "User registered successfully",
+			"payload": newUser,
+		})
+
+	}
 }

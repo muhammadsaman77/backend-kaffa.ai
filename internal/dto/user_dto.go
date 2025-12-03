@@ -6,10 +6,10 @@ type LoginRequest struct {
 }
 
 type RegisterRequest struct {
-	Username string `json:"username" validate:"required,min=2,max=30"`
-	Password string `json:"password" validate:"required,min=8,max=100"`
-	Email    string `json:"email" validate:"required,min=2,max=50"`
-	RoleID   int    `json:"role_id" validate:"required"`
+	Username        string `json:"username" validate:"required,min=2,max=30"`
+	Email           string `json:"email" validate:"required,min=2,max=50"`
+	Password        string `json:"password" validate:"required,min=8,max=100"`
+	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password"`
 }
 
 type LoginResponse struct {
@@ -18,8 +18,10 @@ type LoginResponse struct {
 
 type RegisterResponse struct {
 	AccessToken string `json:"access_token"`
-	UserID      int    `json:"user_id"`
+	UserID      string `json:"user_id"`
 	Username    string `json:"username"`
 	Email       string `json:"email"`
-	RoleID      int    `json:"role_id"`
+	RoleID      string `json:"role_id"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
 }

@@ -7,7 +7,51 @@ package users
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (id, username, email, password, role_id) VALUES ($1, $2, $3, $4, $5)
+RETURNING id, username, email, role_id, created_at, updated_at
+`
+
+type CreateUserParams struct {
+	ID       string
+	Username string
+	Email    string
+	Password string
+	RoleID   string
+}
+
+type CreateUserRow struct {
+	ID        string
+	Username  string
+	Email     string
+	RoleID    string
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
+	row := q.db.QueryRow(ctx, createUser,
+		arg.ID,
+		arg.Username,
+		arg.Email,
+		arg.Password,
+		arg.RoleID,
+	)
+	var i CreateUserRow
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.RoleID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
 
 const getUserByEmailOrUsername = `-- name: GetUserByEmailOrUsername :one
 SELECT id, username, email, password, role_id FROM users WHERE email = $1 OR username = $1
