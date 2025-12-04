@@ -17,20 +17,20 @@ func NewAuthController(authService services.AuthService) AuthController {
 	}
 }
 
-func (controller *AuthControllerImpl) LoginUser(c *gin.Context) {
+func (c *AuthControllerImpl) LoginUser(ctx *gin.Context) {
 	var loginRequest dto.LoginRequest
-	if err := c.ShouldBindJSON(&loginRequest); err != nil {
-		c.JSON(400, gin.H{
+	if err := ctx.ShouldBindJSON(&loginRequest); err != nil {
+		ctx.JSON(400, gin.H{
 			"mesage": "Invalid request payload",
 			"error":  pkg.ParseValidationErrors(err),
 		})
 
 		return
 	}
-	loginResponse, err := controller.AuthService.LoginUser(c.Request.Context(), &loginRequest)
+	loginResponse, err := c.AuthService.LoginUser(ctx.Request.Context(), &loginRequest)
 	if err != nil {
 		if err.Error() == "USER_NOT_FOUND" || err.Error() == "INVALID_PASSWORD" {
-			c.JSON(401, gin.H{
+			ctx.JSON(401, gin.H{
 				"message": "Unauthorized",
 				"error":   "Invalid username or password",
 			})
@@ -38,7 +38,7 @@ func (controller *AuthControllerImpl) LoginUser(c *gin.Context) {
 
 		}
 		if err.Error() == "TOKEN_GENERATION_FAILED" {
-			c.JSON(500, gin.H{
+			ctx.JSON(500, gin.H{
 				"message": "Internal Server Error",
 				"error":   "Failed to generate access token",
 			})
@@ -46,44 +46,44 @@ func (controller *AuthControllerImpl) LoginUser(c *gin.Context) {
 		}
 
 	}
-	c.JSON(200, gin.H{
+	ctx.JSON(200, gin.H{
 		"message": "Login successful",
 		"payload": loginResponse,
 	})
 }
 
-func (controller *AuthControllerImpl) RegisterUser(c *gin.Context) {
+func (c *AuthControllerImpl) RegisterUser(ctx *gin.Context) {
 	var registerRequest dto.RegisterRequest
-	if err := c.ShouldBindJSON(&registerRequest); err != nil {
-		c.JSON(400, gin.H{
+	if err := ctx.ShouldBindJSON(&registerRequest); err != nil {
+		ctx.JSON(400, gin.H{
 			"mesage": "Invalid request payload",
 			"error":  pkg.ParseValidationErrors(err),
 		})
 		return
 	}
-	newUser, err := controller.AuthService.RegisterUser(c.Request.Context(), &registerRequest)
+	newUser, err := c.AuthService.RegisterUser(ctx.Request.Context(), &registerRequest)
 	if err != nil {
 		if err.Error() == "PASSWORD_HASHING_FAILED" {
-			c.JSON(500, gin.H{
+			ctx.JSON(500, gin.H{
 				"message": "Internal Server Error",
 				"error":   "Failed to hash password",
 			})
 			return
 		}
 		if err.Error() == "USER_ALREADY_EXISTS" {
-			c.JSON(409, gin.H{
+			ctx.JSON(409, gin.H{
 				"message": "Conflict",
 				"error":   "User with given email or username already exists",
 			})
 			return
 		}
-		c.JSON(500, gin.H{
+		ctx.JSON(500, gin.H{
 			"message": "Internal Server Error",
 			"error":   err,
 		})
 		return
 	}
-	c.JSON(201, gin.H{
+	ctx.JSON(201, gin.H{
 		"message": "User registered successfully",
 		"payload": newUser,
 	})

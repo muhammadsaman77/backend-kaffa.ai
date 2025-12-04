@@ -3,12 +3,12 @@ module backend-kaffa.ai
 go 1.25.1
 
 require (
-	github.com/bytedance/gopkg v0.1.3
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/oklog/ulid/v2 v2.1.1
 	github.com/spf13/viper v1.21.0
 	go.uber.org/zap v1.27.1
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (
@@ -51,7 +51,6 @@ require (
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
 require (

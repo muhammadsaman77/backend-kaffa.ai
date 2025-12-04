@@ -9,3 +9,12 @@ sql:
         package: "users"
         out: "internal/sqlc/users"
         sql_package: "pgx/v5"
+  - engine: "postgresql"
+    queries: "db/queries/product.sql"
+    schema: 
+    - "db/schemas/product.sql"
+    gen:
+      go:
+        package: "products"
+        out: "internal/sqlc/products"
+        sql_package: "pgx/v5"

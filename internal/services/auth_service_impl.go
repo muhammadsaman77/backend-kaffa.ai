@@ -72,6 +72,7 @@ func (s *AuthServiceImpl) RegisterUser(ctx context.Context, registerRequest *dto
 	})
 	if pgErr, ok := err.(*pgconn.PgError); ok {
 		if pgErr.Code == "23505" {
+			configs.Log.Error("user already exists", zap.String("username", registerRequest.Username), zap.String("email", registerRequest.Email))
 			return nil, errors.New("USER_ALREADY_EXISTS")
 		}
 	}

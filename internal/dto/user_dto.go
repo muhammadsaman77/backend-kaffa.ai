@@ -1,15 +1,15 @@
 package dto
 
 type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required,min=8,max=100"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required,min=8,max=100"`
 }
 
 type RegisterRequest struct {
-	Username        string `json:"username" validate:"required,min=2,max=30"`
-	Email           string `json:"email" validate:"required,min=2,max=50"`
-	Password        string `json:"password" validate:"required,min=8,max=100"`
-	ConfirmPassword string `json:"confirm_password" validate:"required,eqfield=Password"`
+	Username        string `json:"username" binding:"required,min=2,max=30"`
+	Email           string `json:"email" binding:"required,min=2,max=50"`
+	Password        string `json:"password" binding:"required,min=8,max=100"`
+	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=Password"`
 }
 
 type LoginResponse struct {
