@@ -9,7 +9,20 @@ services:
       - "5436:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    environment:
+      MINIO_ROOT_USER: admin_minio
+      MINIO_ROOT_PASSWORD: admin_minio_password
+    command: server /data --console-address ":9003"
+    ports:
+      - "9002:9000"
+      - "9003:9003"
+    volumes:
+      - minio_data:/data
+    
 volumes:
   postgres_data:
     driver: local
-
+  minio_data:
+    driver: local

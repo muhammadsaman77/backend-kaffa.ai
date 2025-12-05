@@ -12,14 +12,15 @@ import (
 )
 
 const createProduct = `-- name: CreateProduct :one
-INSERT INTO products (id, store_id, name, description, price, is_available)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, store_id, name, description, price, is_available, created_at, updated_at
+INSERT INTO products (id, store_id, image_id, name, description, price, is_available)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, store_id, image_id, name, description, price, is_available, created_at, updated_at
 `
 
 type CreateProductParams struct {
 	ID          string
 	StoreID     string
+	ImageID     pgtype.Text
 	Name        string
 	Description pgtype.Text
 	Price       pgtype.Numeric
@@ -30,6 +31,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	row := q.db.QueryRow(ctx, createProduct,
 		arg.ID,
 		arg.StoreID,
+		arg.ImageID,
 		arg.Name,
 		arg.Description,
 		arg.Price,
@@ -39,10 +41,124 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	err := row.Scan(
 		&i.ID,
 		&i.StoreID,
+		&i.ImageID,
 		&i.Name,
 		&i.Description,
 		&i.Price,
 		&i.IsAvailable,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const deleteProduct = `-- name: DeleteProduct :exec
+DELETE FROM products
+WHERE id = $1
+`
+
+func (q *Queries) DeleteProduct(ctx context.Context, id string) error {
+	_, err := q.db.Exec(ctx, deleteProduct, id)
+	return err
+}
+
+const getListProductsByStoreId = `-- name: GetListProductsByStoreId :many
+SELECT 
+    p.id AS id,
+    p.name AS name,
+    p.description AS description,
+    p.price AS price,
+    p.is_available AS is_available,
+    i.path AS path,
+    p.created_at AS created_at,
+    p.updated_at AS updated_at
+FROM products p
+LEFT JOIN images i ON p.image_id = i.id
+WHERE p.store_id = $1
+`
+
+type GetListProductsByStoreIdRow struct {
+	ID          string
+	Name        string
+	Description pgtype.Text
+	Price       pgtype.Numeric
+	IsAvailable pgtype.Bool
+	Path        pgtype.Text
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
+}
+
+func (q *Queries) GetListProductsByStoreId(ctx context.Context, storeID string) ([]GetListProductsByStoreIdRow, error) {
+	rows, err := q.db.Query(ctx, getListProductsByStoreId, storeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetListProductsByStoreIdRow
+	for rows.Next() {
+		var i GetListProductsByStoreIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.IsAvailable,
+			&i.Path,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getProductById = `-- name: GetProductById :one
+SELECT 
+    p.id AS id,
+    p.store_id AS store_id,
+    p.image_id AS image_id,
+    p.name AS name,
+    p.description AS description,
+    p.price AS price,
+    p.is_available AS is_available,
+    i.path AS path,
+    p.created_at AS created_at,
+    p.updated_at AS updated_at
+FROM products p
+LEFT JOIN images i ON p.image_id = i.id
+WHERE p.id = $1
+`
+
+type GetProductByIdRow struct {
+	ID          string
+	StoreID     string
+	ImageID     pgtype.Text
+	Name        string
+	Description pgtype.Text
+	Price       pgtype.Numeric
+	IsAvailable pgtype.Bool
+	Path        pgtype.Text
+	CreatedAt   pgtype.Timestamp
+	UpdatedAt   pgtype.Timestamp
+}
+
+func (q *Queries) GetProductById(ctx context.Context, id string) (GetProductByIdRow, error) {
+	row := q.db.QueryRow(ctx, getProductById, id)
+	var i GetProductByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.StoreID,
+		&i.ImageID,
+		&i.Name,
+		&i.Description,
+		&i.Price,
+		&i.IsAvailable,
+		&i.Path,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

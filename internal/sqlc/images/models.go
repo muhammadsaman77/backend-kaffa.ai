@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.30.0
 
-package products
+package images
 
 import (
 	"github.com/jackc/pgx/v5/pgtype"
@@ -15,16 +15,4 @@ type Image struct {
 	MimeType     string
 	Path         string
 	CreatedAt    pgtype.Timestamp
-}
-
-type Product struct {
-	ID          string
-	StoreID     string
-	ImageID     pgtype.Text
-	Name        string
-	Description pgtype.Text
-	Price       pgtype.Numeric
-	IsAvailable pgtype.Bool
-	CreatedAt   pgtype.Timestamp
-	UpdatedAt   pgtype.Timestamp
 }

@@ -1,0 +1,8 @@
+CREATE TABLE images (
+    id CHAR(26) PRIMARY KEY,
+    original_name VARCHAR(255) NOT NULL,
+    size INT NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    path VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

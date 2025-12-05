@@ -13,8 +13,18 @@ sql:
     queries: "db/queries/product.sql"
     schema: 
     - "db/schemas/product.sql"
+    - "db/schemas/image.sql"
     gen:
       go:
         package: "products"
         out: "internal/sqlc/products"
+        sql_package: "pgx/v5"
+  - engine: "postgresql"
+    queries: "db/queries/image.sql"
+    schema:
+    - "db/schemas/image.sql"
+    gen:
+      go:
+        package: "images"
+        out: "internal/sqlc/images"
         sql_package: "pgx/v5"

@@ -1,0 +1,2 @@
+ALTER TABLE products ADD COLUMN image_id CHAR(26);
+ALTER TABLE products ADD CONSTRAINT fk_image FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE SET NULL;

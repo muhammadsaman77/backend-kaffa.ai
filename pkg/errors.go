@@ -1,6 +1,10 @@
 package pkg
 
-import "github.com/go-playground/validator/v10"
+import (
+	"errors"
+
+	"github.com/go-playground/validator/v10"
+)
 
 func ParseValidationErrors(err error) map[string]string {
 	validationErrors := make(map[string]string)
@@ -29,3 +33,17 @@ func ParseValidationErrors(err error) map[string]string {
 
 	return validationErrors
 }
+
+var (
+	ErrInvalidImageMimeType      = errors.New("INVALID_IMAGE_MIME_TYPE")
+	ErrImageSizeExceedsLimit     = errors.New("IMAGE_SIZE_EXCEEDS_LIMIT")
+	ErrFailedToUploadImage       = errors.New("FAILED_TO_UPLOAD_IMAGE")
+	ErrInvalidPrice              = errors.New("INVALID_PRICE")
+	ErrFailedToCreateProduct     = errors.New("FAILED_TO_CREATE_PRODUCT")
+	ErrStoreNotFound             = errors.New("STORE_NOT_FOUND")
+	ErrFailedDeleteObject        = errors.New("FAILED_TO_DELETE_OBJECT")
+	ErrFailedToGetProductDetails = errors.New("FAILED_TO_GET_PRODUCT_DETAILS")
+	ErrFailedToDeleteProduct     = errors.New("FAILED_TO_DELETE_PRODUCT")
+	ErrFailedToDeleteImage       = errors.New("FAILED_TO_DELETE_IMAGE")
+	ErrProductNotFound           = errors.New("PRODUCT_NOT_FOUND")
+)
